@@ -40,8 +40,8 @@ class Main:
         self.logger_dependent_1 = logger_dependent_1
         self.logger_dependent_2 = logger_dependent_2
 
-    def execute(self):
-        self.logger.instance_value = str(uuid.uuid4())
+    def execute(self, context):
+        self.logger.instance_value = context.aws_request_id
         self.logger.print("log configurado")
         self.logger_dependent_1.execute()
         self.logger_dependent_2.execute()
@@ -54,5 +54,10 @@ class MyContainer(Injector):
     main = Main
 
 
-if __name__ == '__main__':
-    MyContainer.main.execute()
+def lambda_handler(event, context):
+    MyContainer.main.execute(context)
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Hello from Lambda!')
+    }
